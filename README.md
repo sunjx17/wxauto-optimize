@@ -1,3 +1,11 @@
+## 根据cluic/wxauto开源版本修改，测试微信3.9.12.17可用。
+对主要修改内容做说明如下：
+|  文件  | 说明 |
+| :----: | :--: |
+| elements.py | ChatWnd类增加GetNewMessageOptimize方法，直接通过uia反向遍历方式查找新消息，避免线GetAllMessage再排除的冗余计算量，同步添加相应开关量；添加了部分类型注释 |
+| wxauto.py | Wechat.GetListenMessage添加了优化方法的入口，以及监听新消息时是否返回全部消息的开关量（用于第一次调用）；添加了部分类型注释 |
+
+
 [![wxauto](https://github.com/cluic/wxauto/blob/WeChat3.9.11/utils/wxauto.png)](https://wxauto.loux.cc)
 # wxauto  (适用PC微信3.9.11.17版本）
 
