@@ -1,7 +1,8 @@
 """
 Author: Cluic
-Update: 2024-07-22
-Version: 3.9.11.17.4
+Fork by sunjx17
+Update: 2024-12-24
+Version: 3.9.12.17
 """
 
 from . import uiautomation as uia
@@ -14,14 +15,14 @@ import time
 import os
 import re
 try:
-    from typing import Literal
+    from typing import Literal,Dict
 except:
     from typing_extensions import Literal
 
 class WeChat(WeChatBase):
-    VERSION: str = '3.9.11.17'
+    VERSION: str = '3.9.12.17'
     lastmsgid: str = None
-    listen: dict = dict()
+    listen: Dict[str,ChatWnd] = dict()
     SessionItemList: list = []
 
     def __init__(
@@ -559,7 +560,7 @@ class WeChat(WeChatBase):
         wxlog.debug(f'获取到 {len(AcceptableNewFriendsList)} 条新的好友申请')
         return AcceptableNewFriendsList
     
-    def AddListenChat(self, who, savepic=False, savefile=False, savevoice=False):
+    def AddListenChat(self, who:str, savepic=False, savefile=False, savevoice=False):
         """添加监听对象
         
         Args:
@@ -577,23 +578,37 @@ class WeChat(WeChatBase):
         self.listen[who].savefile = savefile
         self.listen[who].savevoice = savevoice
 
-    def GetListenMessage(self, who=None):
+    def GetListenMessage(self, who=None,getNew=True,useOptimize=False):
         """获取监听对象的新消息
         
         Args:
             who (str, optional): 要获取消息的聊天对象名，如果为None，则获取所有监听对象的消息
+            getNew bool:是否只获取新消息
+            useOptimize:是否开启优化模式，仅在getNew为True时有效
 
         Returns:
             str|dict: 如果
         """
         if who and who in self.listen:
             chat = self.listen[who]
-            msg = chat.GetNewMessage(savepic=chat.savepic, savefile=chat.savefile, savevoice=chat.savevoice)
+            if getNew:
+              if useOptimize:
+                  msg = chat.GetNewMessageOptimize(savepic=chat.savepic, savefile=chat.savefile, savevoice=chat.savevoice)
+              else:
+                  msg=chat.GetNewMessage(savepic=chat.savepic, savefile=chat.savefile, savevoice=chat.savevoice)
+            else:
+              msg=chat.GetAllMessage(savepic=chat.savepic, savefile=chat.savefile, savevoice=chat.savevoice,storechatids=True)
             return msg
         msgs = {}
         for who in self.listen:
             chat = self.listen[who]
-            msg = chat.GetNewMessage(savepic=chat.savepic, savefile=chat.savefile, savevoice=chat.savevoice)
+            if getNew:
+              if useOptimize:
+                  msg = chat.GetNewMessageOptimize(savepic=chat.savepic, savefile=chat.savefile, savevoice=chat.savevoice)
+              else:
+                  msg=chat.GetNewMessage(savepic=chat.savepic, savefile=chat.savefile, savevoice=chat.savevoice)
+            else:
+              msg=chat.GetAllMessage(savepic=chat.savepic, savefile=chat.savefile, savevoice=chat.savevoice,storechatids=True)
             if msg:
                 msgs[chat] = msg
         return msgs
